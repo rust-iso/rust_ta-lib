@@ -5,11 +5,8 @@ edition = "2021"
 description="TA-Lib - Technical Analysis Library"
 repository="https://github.com/rust-iso/rust_ta-lib"
 license="Apache-2.0"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-exclude = ["src/*.py"]
 documentation = "https://docs.rs/rust_ta-libs/"
 keywords=["talib", "ta-lib", "Technical Analysis", "Fintech"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 exclude = ["3rdparty/ta-lib/ide"]
 [dependencies]
 
