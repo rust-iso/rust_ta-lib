@@ -6,7 +6,7 @@ description="TA-Lib - Technical Analysis Library"
 repository="https://github.com/rust-iso/rust_ta-lib"
 license="Apache-2.0"
 documentation = "https://docs.rs/rust_ta-libs/"
-keywords=["talib", "ta-lib", "Technical Analysis", "Fintech"]
+keywords=["talib", "ta-lib", "Technical", "Analysis","Fintech"]
 exclude = ["3rdparty/ta-lib/ide"]
 [dependencies]
 
