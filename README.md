@@ -17,3 +17,18 @@
 # !important
 
 - if you found some func that you want to use is not implement just submit an issue or implement it like src/wrapper.rs then submit a PR , just feed free for it
+
+# sample
+
+```rust
+let close_prices: Vec<f64> = vec![
+    1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+    1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+    1.086670, 1.086630,
+];
+let (sma_values, begin) = rust_ta_lib::wrapper::sma(10, &close_prices);
+    // print values
+for (index, value) in sma_values.iter().enumerate() {
+    println!("Close index {} = {}", begin + index as i32 + 1, value);
+}
+```
