@@ -57,11 +57,274 @@ pub fn accbands(
     (outUpper, middleUpper, lowerUpper, out_begin)
 }
 
-pub fn s_accbands() {}
-pub fn acos() {}
-pub fn s_acos() {}
-pub fn ad() {}
-pub fn s_ad() {}
+/// TA_ACCBANDS - Acceleration Bands
+/// #Sample
+/// ```
+/// let close_prices: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high_prices = close_prices.clone();
+/// let low_prices = close_prices.clone();
+/// let (uppers,middles,lowers, begin) = rust_ta_lib::wrapper::s_accbands(10, &high_prices,&low_prices,&close_prices);
+/// for (index, value) in uppers.iter().enumerate() {
+///        println!("upper index {} = {}", begin + index as i32 + 1, value);
+///        println!("middle index {} = {:?}", begin + index as i32 + 1, middles.get(index));
+///        println!("lower index {} = {:?}", begin + index as i32 + 1,  lowers.get(index));
+///  }
+/// ```
+pub fn s_accbands(
+    period: u32,
+    high: &Vec<f32>,
+    low: &Vec<f32>,
+    close: &Vec<f32>,
+) -> (Vec<f64>, Vec<f64>, Vec<f64>, crate::TA_Integer) {
+    let mut outUpper: Vec<f64> = Vec::with_capacity(close.len());
+    let mut middleUpper: Vec<f64> = Vec::with_capacity(close.len());
+    let mut lowerUpper: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_S_ACCBANDS(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            high.as_ptr(),          // pointer to the first element of the high vector
+            low.as_ptr(),           // pointer to the first element of the low vector
+            close.as_ptr(),         // pointer to the first element of the close vector
+            period as i32,          // period of the atr
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            outUpper.as_mut_ptr(),  // pointer to the first element of the output vector
+            middleUpper.as_mut_ptr(),
+            lowerUpper.as_mut_ptr(),
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => outUpper.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (outUpper, middleUpper, lowerUpper, out_begin)
+}
+
+///
+/// TA_COS - Vector Trigonometric Cos
+///
+/// Input  = double
+/// Output = double
+/// #Sample
+/// ```
+/// let close_prices: Vec<f64> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let (outs, begin) = rust_ta_lib::wrapper::acos(&close_prices);
+/// for (index, value) in outs.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn acos(close: &Vec<f64>) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+
+        let ret_code = crate::TA_COS(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
+
+///
+/// TA_COS - Vector Trigonometric Cos
+///
+/// Input  = double
+/// Output = double
+/// #Sample
+/// ```
+/// let close_prices: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let (outs, begin) = rust_ta_lib::wrapper::s_acos(&close_prices);
+/// for (index, value) in outs.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn s_acos(close: &Vec<f32>) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+
+        let ret_code = crate::TA_S_COS(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
+///
+/// TA_AD - Chaikin A/D Line
+///
+/// Input  = High, Low, Close, Volume
+/// Output = double
+/// #Sample
+/// ```
+/// let close_prices: Vec<f64> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high_prices = close_prices.clone();
+/// let low_prices = close_prices.clone();
+/// let volume = close_prices.clone();
+/// let (outs, begin) = rust_ta_lib::wrapper::ad( &high_prices,&low_prices,&close_prices,&volume);
+/// for (index, value) in outs.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn ad(
+    high: &Vec<f64>,
+    low: &Vec<f64>,
+    close: &Vec<f64>,
+    volume: &Vec<f64>,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_AD(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            high.as_ptr(),          // pointer to the first element of the high vector
+            low.as_ptr(),           // pointer to the first element of the low vector
+            close.as_ptr(),         // pointer to the first element of the close vector
+            volume.as_ptr(),        // pointer to the first element of the volume vector
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
+///
+/// TA_S_AD - Chaikin A/D Line
+///
+/// Input  = High, Low, Close, Volume
+/// Output = double
+/// #Sample
+/// ```
+/// let close_prices: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high_prices = close_prices.clone();
+/// let low_prices = close_prices.clone();
+/// let volume = close_prices.clone();
+/// let (outs, begin) = rust_ta_lib::wrapper::s_ad( &high_prices,&low_prices,&close_prices,&volume);
+/// for (index, value) in outs.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn s_ad(
+    high: &Vec<f32>,
+    low: &Vec<f32>,
+    close: &Vec<f32>,
+    volume: &Vec<f32>,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_S_AD(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            high.as_ptr(),          // pointer to the first element of the high vector
+            low.as_ptr(),           // pointer to the first element of the low vector
+            close.as_ptr(),         // pointer to the first element of the close vector
+            volume.as_ptr(),        // pointer to the first element of the volume vector
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn add() {}
 pub fn s_add() {}
 pub fn adosc() {}

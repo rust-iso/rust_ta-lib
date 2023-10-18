@@ -12,8 +12,8 @@ fn main() {
     for (index, value) in sma_values.iter().enumerate() {
         println!("Close index {} = {}", begin + index as i32 + 1, value);
     }
-    let (uppers, middles, lowers, begin) =
-        rust_ta_lib::wrapper::accbands(10, &close_prices, &close_prices, &close_prices);
+    // let (uppers, middles, lowers, begin) =
+    // rust_ta_lib::wrapper::accbands(10, &close_prices, &close_prices, &close_prices);
 }
 
 //https://fitzgeraldnick.com/2016/12/14/using-libbindgen-in-build-rs.html
