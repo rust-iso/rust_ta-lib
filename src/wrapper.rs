@@ -1320,5 +1320,107 @@ pub fn wclprice() {}
 pub fn s_wclprice() {}
 pub fn willr() {}
 pub fn s_willr() {}
-pub fn wma() {}
-pub fn s_wma() {}
+///
+/// TA_WMA - Weighted Moving Average
+///
+/// Input  = double
+/// Output = double
+/// -------------------
+/// optInTimePeriod:(From 2 to 100000)
+///    Number of period
+//
+/// #Sample
+/// ```
+/// let close_prices: Vec<f64> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let (outs, begin) = rust_ta_lib::wrapper::wma(10,&close_prices);
+/// for (index, value) in outs.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn wma(period: u32, close: &Vec<f64>) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+
+        let ret_code = crate::TA_WMA(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            period as i32,          // period of the ma
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
+///
+/// TA_S_WMA - Weighted Moving Average
+///
+/// Input  = double
+/// Output = double
+/// -------------------
+/// optInTimePeriod:(From 2 to 100000)
+///    Number of period
+//
+/// #Sample
+/// ```
+/// let close_prices: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let (outs, begin) = rust_ta_lib::wrapper::s_wma(10,&close_prices);
+/// for (index, value) in outs.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn s_wma(period: u32, close: &Vec<f32>) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+
+        let ret_code = crate::TA_S_WMA(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            period as i32,          // period of the ma
+            &mut out_begin,         // set to index of the first close to have an atr value
+            &mut out_size,          // set to number of atr values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
