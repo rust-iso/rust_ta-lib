@@ -1,3 +1,6 @@
+# TA-Lib - Technical Analysis Library
+- The official home for C/C++ TA-Lib is [ https://ta-lib.org]( https://ta-lib.org).
+
 - it is a skelton to build ffi for rust
 
 # refs
