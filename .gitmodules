@@ -1,3 +1,4 @@
 [submodule "3rdparty/ta-lib"]
 	path = 3rdparty/ta-lib
 	url = git@github.com:TA-Lib/ta-lib.git
+  tag = v0.6.0-rc.1
