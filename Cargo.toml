@@ -4,7 +4,7 @@ version = "0.6.0-rc.1.build.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
+exclude = ["3rdparty/ta-lib/ide"]
 [dependencies]
 
 [build-dependencies]
@@ -12,6 +12,3 @@ bindgen = "0.68.1"
 cmake = "0.1.50"
 concat-idents = "1.1.5"
 rand = "0.8.5"
-
-[package]
-exclude = ["3rdparty/ta-lib/ide"]
