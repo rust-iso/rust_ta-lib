@@ -1107,8 +1107,185 @@ pub fn sqrt() {}
 pub fn s_sqrt() {}
 pub fn stddev() {}
 pub fn s_stddev() {}
-pub fn stoch() {}
-pub fn s_stoch() {}
+///
+/// TA_STOCH - Stochastic
+///
+/// Input  = High, Low, Close
+/// Output = double, double
+///
+/// Optional Parameters
+/// -------------------
+/// optInFastK_Period:(From 1 to 100000)
+///    Time period for building the Fast-K line
+///
+/// optInSlowK_Period:(From 1 to 100000)
+///    Smoothing for making the Slow-K line. Usually set to 3
+///
+/// optInSlowK_MAType:
+///    Type of Moving Average for Slow-K
+///
+/// optInSlowD_Period:(From 1 to 100000)
+///    Smoothing for making the Slow-D line
+///
+/// optInSlowD_MAType:
+///    Type of Moving Average for Slow-D
+///
+/// #Sample
+/// ```
+/// let inReal: Vec<f64> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high = inReal.clone();
+/// let low = inReal.clone();
+/// let close = inReal.clone();
+/// let (outSlowK,outSlowD, begin) = rust_ta_lib::wrapper::stoch(9,3,0,3,0,&high,&low,&close);
+/// for (index, value) in outSlowK.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///         println!("outs index {} = {:?}", begin + index as i32 + 1, outSlowD.get(index));
+///  }
+/// ```
+pub fn stoch(
+    fastk_period: u32,
+    slowk_period: u32,
+    optInSlowK_MAType: crate::TA_MAType,
+    slowd_period: u32,
+    optInSlowD_MAType: crate::TA_MAType,
+    high: &Vec<f64>,
+    low: &Vec<f64>,
+    close: &Vec<f64>,
+) -> (Vec<f64>, Vec<f64>, crate::TA_Integer) {
+    let mut outSlowK: Vec<f64> = Vec::with_capacity(close.len());
+    let mut outSlowD: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_STOCH(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            high.as_ptr(),          // pointer to the first element of the high vector
+            low.as_ptr(),           // pointer to the first element of the low vector
+            close.as_ptr(),         // pointer to the first element of the close vector
+            fastk_period as i32,    // period of the atr
+            slowk_period as i32,
+            optInSlowK_MAType,
+            slowd_period as i32,
+            optInSlowD_MAType,
+            &mut out_begin, // set to index of the first close to have an atr value
+            &mut out_size,  // set to number of atr values computed
+            outSlowK.as_mut_ptr(), // pointer to the first element of the output vector
+            outSlowD.as_mut_ptr(),
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => {
+                outSlowK.set_len(out_size as usize);
+                outSlowD.set_len(out_size as usize);
+            }
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (outSlowK, outSlowD, out_begin)
+}
+///
+/// TA_S_STOCH - Stochastic
+///
+/// Input  = High, Low, Close
+/// Output = double, double
+///
+/// Optional Parameters
+/// -------------------
+/// optInFastK_Period:(From 1 to 100000)
+///    Time period for building the Fast-K line
+///
+/// optInSlowK_Period:(From 1 to 100000)
+///    Smoothing for making the Slow-K line. Usually set to 3
+///
+/// optInSlowK_MAType:
+///    Type of Moving Average for Slow-K
+///
+/// optInSlowD_Period:(From 1 to 100000)
+///    Smoothing for making the Slow-D line
+///
+/// optInSlowD_MAType:
+///    Type of Moving Average for Slow-D
+///
+/// #Sample
+/// ```
+/// let inReal: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high = inReal.clone();
+/// let low = inReal.clone();
+/// let close = inReal.clone();
+/// let (outSlowK,outSlowD, begin) = rust_ta_lib::wrapper::s_stoch(9,3,0,3,0,&high,&low,&close);
+/// for (index, value) in outSlowK.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///         println!("outs index {} = {:?}", begin + index as i32 + 1, outSlowD.get(index));
+///  }
+/// ```
+pub fn s_stoch(
+    fastk_period: u32,
+    slowk_period: u32,
+    optInSlowK_MAType: crate::TA_MAType,
+    slowd_period: u32,
+    optInSlowD_MAType: crate::TA_MAType,
+    high: &Vec<f32>,
+    low: &Vec<f32>,
+    close: &Vec<f32>,
+) -> (Vec<f64>, Vec<f64>, crate::TA_Integer) {
+    let mut outSlowK: Vec<f64> = Vec::with_capacity(close.len());
+    let mut outSlowD: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_S_STOCH(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            high.as_ptr(),          // pointer to the first element of the high vector
+            low.as_ptr(),           // pointer to the first element of the low vector
+            close.as_ptr(),         // pointer to the first element of the close vector
+            fastk_period as i32,    // period of the atr
+            slowk_period as i32,
+            optInSlowK_MAType,
+            slowd_period as i32,
+            optInSlowD_MAType,
+            &mut out_begin, // set to index of the first close to have an atr value
+            &mut out_size,  // set to number of atr values computed
+            outSlowK.as_mut_ptr(), // pointer to the first element of the output vector
+            outSlowD.as_mut_ptr(),
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => {
+                outSlowK.set_len(out_size as usize);
+                outSlowD.set_len(out_size as usize);
+            }
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (outSlowK, outSlowD, out_begin)
+}
+
 pub fn stochf() {}
 pub fn s_stochf() {}
 pub fn stochrsi() {}
