@@ -705,8 +705,162 @@ pub fn s_ma(
 
     (out, out_begin)
 }
-pub fn macd() {}
-pub fn s_macd() {}
+///
+/// TA_MACD - Moving Average Convergence/Divergence
+///
+/// Input  = double
+/// Output = double, double, double
+///
+/// Optional Parameters
+/// -------------------
+/// optInFastPeriod:(From 2 to 100000)
+///    Number of period for the fast MA
+///
+/// optInSlowPeriod:(From 2 to 100000)
+///    Number of period for the slow MA
+///
+/// optInSignalPeriod:(From 1 to 100000)
+///    Smoothing for the signal line (nb of period)
+///
+///
+/// #Sample
+/// ```
+/// let close_prices: Vec<f64> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let (macd,macd_signal,macd_hist, begin) = rust_ta_lib::wrapper::macd(2,5,10,&close_prices);
+/// for (index, value) in macd.iter().enumerate() {
+///        println!("macd index {} = {}", begin + index as i32 + 1, value);
+///        println!("macd_signal index {} = {:?}", begin + index as i32 + 1, macd_signal.get(index));
+///        println!("macd_hist index {} = {:?}", begin + index as i32 + 1, macd_hist.get(index));
+///  }
+/// ```
+pub fn macd(
+    fast_period: u32,
+    slow_period: u32,
+    signal_period: u32,
+    close: &Vec<f64>,
+) -> (Vec<f64>, Vec<f64>, Vec<f64>, crate::TA_Integer) {
+    let mut macd: Vec<f64> = Vec::with_capacity(close.len());
+    let mut macd_signal: Vec<f64> = Vec::with_capacity(close.len());
+    let mut macd_hist: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+
+        let ret_code = crate::TA_MACD(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            fast_period as i32,     // period of the ma
+            slow_period as i32,
+            signal_period as i32,
+            &mut out_begin,    // set to index of the first close to have an atr value
+            &mut out_size,     // set to number of atr values computed
+            macd.as_mut_ptr(), // pointer to the first element of the output vector
+            macd_signal.as_mut_ptr(), // pointer to the first element of the output vector
+            macd_hist.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => {
+                macd.set_len(out_size as usize);
+                macd_signal.set_len(out_size as usize);
+                macd_hist.set_len(out_size as usize)
+            }
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (macd, macd_signal, macd_hist, out_begin)
+}
+///
+/// TA_MACD - Moving Average Convergence/Divergence
+///
+/// Input  = double
+/// Output = double, double, double
+///
+/// Optional Parameters
+/// -------------------
+/// optInFastPeriod:(From 2 to 100000)
+///    Number of period for the fast MA
+///
+/// optInSlowPeriod:(From 2 to 100000)
+///    Number of period for the slow MA
+///
+/// optInSignalPeriod:(From 1 to 100000)
+///    Smoothing for the signal line (nb of period)
+///
+///
+/// #Sample
+/// ```
+/// let close_prices: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let (macd,macd_signal,macd_hist, begin) = rust_ta_lib::wrapper::s_macd(2,5,10,&close_prices);
+/// for (index, value) in macd.iter().enumerate() {
+///        println!("macd index {} = {}", begin + index as i32 + 1, value);
+///        println!("macd_signal index {} = {:?}", begin + index as i32 + 1, macd_signal.get(index));
+///        println!("macd_hist index {} = {:?}", begin + index as i32 + 1, macd_hist.get(index));
+///  }
+/// ```
+pub fn s_macd(
+    fast_period: u32,
+    slow_period: u32,
+    signal_period: u32,
+    close: &Vec<f32>,
+) -> (Vec<f64>, Vec<f64>, Vec<f64>, crate::TA_Integer) {
+    let mut macd: Vec<f64> = Vec::with_capacity(close.len());
+    let mut macd_signal: Vec<f64> = Vec::with_capacity(close.len());
+    let mut macd_hist: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+
+        let ret_code = crate::TA_S_MACD(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            fast_period as i32,     // period of the ma
+            slow_period as i32,
+            signal_period as i32,
+            &mut out_begin,    // set to index of the first close to have an atr value
+            &mut out_size,     // set to number of atr values computed
+            macd.as_mut_ptr(), // pointer to the first element of the output vector
+            macd_signal.as_mut_ptr(), // pointer to the first element of the output vector
+            macd_hist.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => {
+                macd.set_len(out_size as usize);
+                macd_signal.set_len(out_size as usize);
+                macd_hist.set_len(out_size as usize)
+            }
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (macd, macd_signal, macd_hist, out_begin)
+}
 pub fn macdext() {}
 pub fn s_macdext() {}
 pub fn macdfix() {}
