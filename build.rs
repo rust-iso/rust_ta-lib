@@ -5,11 +5,11 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    std::fs::copy(
-        "CMakeLists-ta-lib-0.6.0-rc.1.replace.txt",
-        "3rdparty/ta-lib/CMakeLists.txt",
-    )
-    .unwrap();
+    // std::fs::copy(
+    //     "CMakeLists-ta-lib-0.6.0-rc.1.replace.txt",
+    //     "3rdparty/ta-lib/CMakeLists.txt",
+    // )
+    // .unwrap();
     // std::fs::copy(
     //     "cmake_install.ta-lib-0.6.0-rc.1.replace.cmake",
     //     "3rdparty/ta-lib/cmake_install.cmake",
