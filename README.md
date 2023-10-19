@@ -32,7 +32,3 @@ for (index, value) in sma_values.iter().enumerate() {
     println!("Close index {} = {}", begin + index as i32 + 1, value);
 }
 ```
-
-## TODO
-
-### MINUS_DM,TA_PLUS_DM,ADX,BOLL,OBV,MAMA
