@@ -1,6 +1,6 @@
 [package]
 name = "rust_ta-lib"
-version = "0.6.0-rc.1.build.2"
+version = "0.6.0-rc.1.build.3"
 edition = "2021"
 description="TA-Lib - Technical Analysis Library"
 repository="https://github.com/rust-iso/rust_ta-lib"
