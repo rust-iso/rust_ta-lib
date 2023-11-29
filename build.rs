@@ -25,7 +25,13 @@ fn main() {
         dst.join("lib").display()
     );
     // Tell rustc to use nng static library
-    println!("cargo:rustc-link-lib=static=ta_lib");
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+
+    if target_os == "windows" {
+        println!("cargo:rustc-link-lib=static=ta_lib_a");
+    } else {
+        println!("cargo:rustc-link-lib=static=ta_lib");
+    }
 
     // println!("cargo:rustc-link-lib=static=ta_lib");
     // let dir = env::var("CARGO_MANIFEST_DIR").unwrap();
