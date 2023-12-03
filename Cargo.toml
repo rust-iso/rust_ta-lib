@@ -11,7 +11,7 @@ exclude = ["3rdparty/ta-lib/ide"]
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.68.1"
+bindgen = "0.69.1"
 cmake = "0.1.50"
 concat-idents = "1.1.5"
 rand = "0.8.5"
