@@ -442,7 +442,55 @@ pub fn s_adx(
 }
 pub fn adxr() {}
 pub fn s_adxr() {}
-pub fn apo() {}
+
+///
+/// TA_APO - Absolute Price Oscillator
+///
+/// `Input`  = close, fastperiod(12), slowperiod(26), matype
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector<f64>
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+pub fn apo(
+    close: &Vec<f64>,
+    fastperiod: i32,
+    slowperiod: i32,
+    matype: crate::TA_MAType,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_APO(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            fastperiod,             // fast period (suggest default 12)
+            slowperiod,             // slow period (suggest default 26)
+            matype,                 // MA Type
+            &mut out_begin,         // set to index of the first close to have an valid output value
+            &mut out_size,          // set to number of values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn s_apo() {}
 pub fn aroon() {}
 pub fn s_aroon() {}
@@ -685,7 +733,60 @@ pub fn beta() {}
 pub fn s_beta() {}
 pub fn bop() {}
 pub fn s_bop() {}
-pub fn cci() {}
+
+///
+/// TA_CCI - Commodity Channel Index
+///
+/// `Input`:  high, low, close, timeperiod
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector <f64>
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+pub fn cci(
+    high: &Vec<f64>,
+    low: &Vec<f64>,
+    close: &Vec<f64>,
+    timeperiod: i32,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let clen = close.len();
+    if clen.ne(&high.len()) || clen.ne(&low.len()) {
+        panic!("The length of input vectors are not equal, please double check the size of each.");
+    }
+
+    let mut out: Vec<f64> = Vec::with_capacity(clen);
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_CCI(
+            0,                // the first index of the input vector to use
+            clen as i32 - 1,  // the last index of the input vector to use
+            high.as_ptr(),    // pointer to the high vector
+            low.as_ptr(),     // pointer to the low vector
+            close.as_ptr(),   // pointer to the close vector
+            timeperiod,       // time period
+            &mut out_begin,   // set to index of the first close to have an valid output value
+            &mut out_size,    // set to number of values computed
+            out.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn s_cci() {}
 pub fn cdl2crows() {}
 pub fn s_cdl2crows() {}
@@ -1262,7 +1363,62 @@ pub fn maxindex() {}
 pub fn s_maxindex() {}
 pub fn medprice() {}
 pub fn s_medprice() {}
-pub fn mfi() {}
+
+///
+/// TA_MFI - Money Flow Index
+///
+/// `Input`:  high, low, close, volume, timeperiod
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector <f64>
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+pub fn mfi(
+    high: &Vec<f64>,
+    low: &Vec<f64>,
+    close: &Vec<f64>,
+    volume: &Vec<f64>,
+    timeperiod: i32,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let clen = close.len();
+    if clen.ne(&high.len()) || clen.ne(&low.len()) || clen.ne(&volume.len()) {
+        panic!("The length of input vectors are not equal, please double check the size of each.");
+    }
+
+    let mut out: Vec<f64> = Vec::with_capacity(clen);
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_MFI(
+            0,                // the first index of the input vector to use
+            clen as i32 - 1,  // the last index of the input vector to use
+            high.as_ptr(),    // pointer to the high vector
+            low.as_ptr(),     // pointer to the low vector
+            close.as_ptr(),   // pointer to the close vector
+            volume.as_ptr(),  // pointer to the volume vector
+            timeperiod,       // time period
+            &mut out_begin,   // set to index of the first close to have an valid output value
+            &mut out_size,    // set to number of values computed
+            out.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn s_mfi() {}
 pub fn midpoint() {}
 pub fn s_midpoint() {}
@@ -1609,7 +1765,54 @@ pub fn s_plus_dm(period: u32, high: &Vec<f32>, low: &Vec<f32>) -> (Vec<f64>, cra
 
     (out, out_begin)
 }
-pub fn ppo() {}
+///
+/// TA_PPO - Percentage Price Oscillator
+///
+/// `Input`  = close, fastperiod(12), slowperiod(26), matype
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector<f64>
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+pub fn ppo(
+    close: &Vec<f64>,
+    fastperiod: i32,
+    slowperiod: i32,
+    matype: crate::TA_MAType,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let mut out: Vec<f64> = Vec::with_capacity(close.len());
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_PPO(
+            0,                      // index of the first close to use
+            close.len() as i32 - 1, // index of the last close to use
+            close.as_ptr(),         // pointer to the first element of the close vector
+            fastperiod,             // fast period (suggest default 12)
+            slowperiod,             // slow period (suggest default 26)
+            matype,                 // MA Type
+            &mut out_begin,         // set to index of the first close to have an valid output value
+            &mut out_size,          // set to number of values computed
+            out.as_mut_ptr(),       // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn s_ppo() {}
 pub fn roc() {}
 pub fn s_roc() {}
@@ -1850,6 +2053,7 @@ pub fn s_stddev() {}
 ///         println!("outs index {} = {:?}", begin + index as i32 + 1, outSlowD.get(index));
 ///  }
 /// ```
+#[allow(clippy::too_many_arguments)]
 pub fn stoch(
     fastk_period: u32,
     slowk_period: u32,
@@ -1939,6 +2143,7 @@ pub fn stoch(
 ///         println!("outs index {} = {:?}", begin + index as i32 + 1, outSlowD.get(index));
 ///  }
 /// ```
+#[allow(clippy::too_many_arguments)]
 pub fn s_stoch(
     fastk_period: u32,
     slowk_period: u32,
@@ -2022,7 +2227,60 @@ pub fn var() {}
 pub fn s_var() {}
 pub fn wclprice() {}
 pub fn s_wclprice() {}
-pub fn willr() {}
+
+///
+/// TA_WILLR - Williams' %R
+///
+/// `Input`:  high, low, close, timeperiod
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector <f64>
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+pub fn willr(
+    high: &Vec<f64>,
+    low: &Vec<f64>,
+    close: &Vec<f64>,
+    timeperiod: i32,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let clen = close.len();
+    if clen.ne(&high.len()) || clen.ne(&low.len()) {
+        panic!("The length of input vectors are not equal, please double check the size of each.");
+    }
+
+    let mut out: Vec<f64> = Vec::with_capacity(clen);
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_WILLR(
+            0,                // the first index of the input vector to use
+            clen as i32 - 1,  // the last index of the input vector to use
+            high.as_ptr(),    // pointer to the high vector
+            low.as_ptr(),     // pointer to the low vector
+            close.as_ptr(),   // pointer to the close vector
+            timeperiod,       // time period
+            &mut out_begin,   // set to index of the first close to have an valid output value
+            &mut out_size,    // set to number of values computed
+            out.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn s_willr() {}
 ///
 /// TA_WMA - Weighted Moving Average
