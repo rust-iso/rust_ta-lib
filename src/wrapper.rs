@@ -494,7 +494,54 @@ pub fn apo(
 pub fn s_apo() {}
 pub fn aroon() {}
 pub fn s_aroon() {}
-pub fn aroonosc() {}
+
+///
+/// TA_AROONOSC - Aroon Oscillator
+///
+/// `Input`:  high, low, timeperiod
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector <f64>
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+pub fn aroonosc(high: &Vec<f64>, low: &Vec<f64>, timeperiod: i32) -> (Vec<f64>, crate::TA_Integer) {
+    let hlen = high.len();
+    if hlen.ne(&low.len()) {
+        panic!("The length of input vectors are not equal, please double check the size of each.");
+    }
+
+    let mut out: Vec<f64> = Vec::with_capacity(hlen);
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_AROONOSC(
+            0,                // the first index of the input vector to use
+            hlen as i32 - 1,  // the last index of the input vector to use
+            high.as_ptr(),    // pointer to the high vector
+            low.as_ptr(),     // pointer to the low vector
+            timeperiod,       // time period
+            &mut out_begin,   // set to index of the first close to have an valid output value
+            &mut out_size,    // set to number of values computed
+            out.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => out.set_len(out_size as usize),
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn s_aroonosc() {}
 pub fn asin() {}
 pub fn s_asin() {}
