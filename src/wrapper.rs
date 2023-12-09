@@ -335,7 +335,7 @@ pub fn s_add() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector <f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -507,7 +507,7 @@ pub fn s_adxr() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector<f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -559,7 +559,7 @@ pub fn s_aroon() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector <f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -845,7 +845,7 @@ pub fn s_bop() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector <f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -1475,7 +1475,7 @@ pub fn s_medprice() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector <f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -1663,7 +1663,7 @@ pub fn s_mult() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector <f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -1929,7 +1929,7 @@ pub fn s_plus_dm(period: u32, high: &Vec<f32>, low: &Vec<f32>) -> (Vec<f64>, cra
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector<f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
@@ -2392,7 +2392,7 @@ pub fn s_wclprice() {}
 ///
 /// `Output`: (1st, 2nd)
 ///
-///    1st: output vector <f64>
+///    1st: output vector(f64)
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
