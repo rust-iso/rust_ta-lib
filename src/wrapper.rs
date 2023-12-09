@@ -2354,7 +2354,67 @@ pub fn s_stoch(
 
 pub fn stochf() {}
 pub fn s_stochf() {}
-pub fn stochrsi() {}
+
+///
+/// TA_STOCHRSI - Stochastic Relative Strength Index
+///
+/// `Input`:  close, timeperiod, fastk_period, fastd_period, fastd_matype=0
+///
+/// `Output`: (1st, 2nd, 3rd)
+///
+///    1st: output fastk vector(f64)
+///
+///    2nd: output fastd vector(f64)
+///
+///    3rd: the first index of inputs corresponding to an valid output value
+///
+pub fn stochrsi(
+    close: &Vec<f64>,
+    timeperiod: i32,
+    fastk_period: i32,
+    fastd_period: i32,
+    fastd_matype: crate::TA_MAType,
+) -> (Vec<f64>, Vec<f64>, crate::TA_Integer) {
+    let clen = close.len();
+
+    let mut out_fastk: Vec<f64> = Vec::with_capacity(clen);
+    let mut out_fastd: Vec<f64> = Vec::with_capacity(clen);
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_STOCHRSI(
+            0,               // the first index of the input vector to use
+            clen as i32 - 1, // the last index of the input vector to use
+            close.as_ptr(),  // pointer to the close vector
+            timeperiod,      // time period
+            fastk_period,    // fastk period
+            fastd_period,    // slowd period
+            fastd_matype,
+            &mut out_begin, // set to index of the first close to have an valid output value
+            &mut out_size,  // set to number of values computed
+            out_fastk.as_mut_ptr(), // pointer to the first element of the output fastk vector
+            out_fastd.as_mut_ptr(), // pointer to the first element of the output fastd vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => {
+                out_fastk.set_len(out_size as usize);
+                out_fastd.set_len(out_size as usize);
+            }
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out_fastk, out_fastd, out_begin)
+}
+
 pub fn s_stochrsi() {}
 pub fn sub() {}
 pub fn s_sub() {}
