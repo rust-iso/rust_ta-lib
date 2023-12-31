@@ -2450,6 +2450,21 @@ pub fn s_typprice() {}
 ///
 ///    2nd: the first index of inputs corresponding to an valid output value
 ///
+/// #Sample
+/// ```
+/// let inReal: Vec<f64> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high = inReal.clone();
+/// let low = inReal.clone();
+/// let close = inReal.clone();
+/// let (out, begin) = rust_ta_lib::wrapper::ultosc(&high,&low,&close,7,14,28);
+/// for (index, value) in out.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
 pub fn ultosc(
     high: &Vec<f64>,
     low: &Vec<f64>,
@@ -2498,7 +2513,81 @@ pub fn ultosc(
 
     (out, out_begin)
 }
-pub fn s_ultosc() {}
+
+///
+/// TA_S_ULTOSC - Ultimate Oscillator
+///
+/// `Input`:  high, low, close, timeperiod1, timeperiod2, timeperiod3
+///
+/// `Output`: (1st, 2nd)
+///
+///    1st: output vector(f32)
+///
+///    2nd: the first index of inputs corresponding to an valid output value
+///
+/// #Sample
+/// ```
+/// let inReal: Vec<f32> = vec![
+///        1.087010, 1.087120, 1.087080, 1.087170, 1.087110, 1.087010, 1.087100, 1.087120, 1.087110,
+///        1.087080, 1.087000, 1.086630, 1.086630, 1.086610, 1.086630, 1.086640, 1.086650, 1.086650,
+///        1.086670, 1.086630,
+/// ];
+/// let high = inReal.clone();
+/// let low = inReal.clone();
+/// let close = inReal.clone();
+/// let (out, begin) = rust_ta_lib::wrapper::s_ultosc(&high,&low,&close,7,14,28);
+/// for (index, value) in out.iter().enumerate() {
+///        println!("outs index {} = {}", begin + index as i32 + 1, value);
+///  }
+/// ```
+pub fn s_ultosc(
+    high: &Vec<f32>,
+    low: &Vec<f32>,
+    close: &Vec<f32>,
+    timeperiod1: i32,
+    timeperiod2: i32,
+    timeperiod3: i32,
+) -> (Vec<f64>, crate::TA_Integer) {
+    let clen = close.len();
+    if clen.ne(&high.len()) || clen.ne(&low.len()) {
+        panic!("The length of input vectors are not equal, please double check the size of each.");
+    }
+
+    let mut out: Vec<f64> = Vec::with_capacity(clen);
+    let mut out_begin: crate::TA_Integer = 0;
+    let mut out_size: crate::TA_Integer = 0;
+
+    unsafe {
+        crate::TA_Initialize();
+        let ret_code = crate::TA_S_ULTOSC(
+            0,                // the first index of the input vector to use
+            clen as i32 - 1,  // the last index of the input vector to use
+            high.as_ptr(),    // pointer to the high vector
+            low.as_ptr(),     // pointer to the low vector
+            close.as_ptr(),   // pointer to the close vector
+            timeperiod1,      // time period1
+            timeperiod2,      // time period2
+            timeperiod3,      // time period3
+            &mut out_begin,   // set to index of the first close to have an valid output value
+            &mut out_size,    // set to number of values computed
+            out.as_mut_ptr(), // pointer to the first element of the output vector
+        );
+
+        match ret_code {
+            // Indicator was computed correctly, since the vector was filled by TA-lib C library,
+            // Rust doesn't know what is the new length of the vector, so we set it manually
+            // to the number of values returned by the TA_ATR call
+            crate::TA_RetCode_TA_SUCCESS => {
+                out.set_len(out_size as usize);
+            }
+            // An error occured
+            _ => panic!("Could not compute indicator, err: {:?}", ret_code),
+        }
+        crate::TA_Shutdown();
+    }
+
+    (out, out_begin)
+}
 pub fn var() {}
 pub fn s_var() {}
 pub fn wclprice() {}
